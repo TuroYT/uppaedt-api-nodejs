@@ -2,7 +2,8 @@
 ? Gestion des plannings
 */
 
-const ical = require('ical');
+
+const ical = require("ical");
 
 //  Interfaces
 /* interface Cours {
@@ -16,52 +17,102 @@ const ical = require('ical');
 }
 */
 
-
-
 const getIcalFromWeb = async (icalURL) => {
-    const reponse = await fetch(icalURL);
-    const vcalendar = await reponse.text();
-    const parsed = ical.parseICS(vcalendar);
-    return parsed;
-}
+  const reponse = await fetch(icalURL);
+  const vcalendar = await reponse.text();
+  const parsed = ical.parseICS(vcalendar);
+  return parsed;
+};
 
-const prepareIcalForDB = async(ical) => {
-    let preparedEvent = []
+const prepareIcalForDB = (ical, groupId = 0) => {
+  let preparedEvent = [];
 
-    // event Formating
-    for (let k in ical){
-        console.log(ical[k])
+  // event Formating
+  for (let k in ical) {
+    // Verification si c'est un event
+    if (ical[k].type === "VEVENT") {
+      // Verif HyperPlanning
+      if (ical[k].categories) {
+        // le planning est au format hyperplanning
 
-        // Verification si c'est un event 
-        if (ical[k].type === 'VEVENT'){
+        // ! HyperPlanning ne fonctionne pas
+        console.log("HyperPlanning non pris en chatge");
+        continue;
 
-            // Verif HyperPlanning
-            if (ical[k].categories){
-                // le planning est au format hyperplanning
+        let event = {
+          groupId: 0,
+          nomCours: string,
+          dateDeb: new Date(ical[k].start),
+          dateFin: new Date(ical[k].end),
+          prof: string,
+          lieu: string,
+          nomTp: string,
+        };
 
-                console.log(ical[k].categories)
-            } else {
-                console.log("pas de cat")
-            }
+        console.log(ical[k].categories);
+      } else {
+        // * planning générique
 
-    
-
-
-
+        let infos = ical[k].description.split("\n");
+        let prof;
+        let groupeTp;
+        if (infos.length === 5) {
+          // pas de prof
+          prof = "NA";
+          groupeTp = infos[2]; // ex : 'TP 5'
+        } else if (infos.length === 6) {
+          prof = infos[3]; // ex : 'YESSOUFOU F. - Info'
+          groupeTp = infos[2]; // ex : 'TP 5'
+        } else {
+          prof = "NA";
+          groupeTp = "NA";
         }
 
+        let event = {
+          groupId: groupId,
+          nomCours: ical[k].summary,
+          dateDeb: new Date(ical[k].start),
+          dateFin: new Date(ical[k].end),
+          prof: prof,
+          lieu: ical[k].location,
+          nomTp: groupeTp,
+        };
 
+        // * Exemple
+        /*
+        {
+          groupId: 1,
+          nomCours: 'R1.02 - Interfaces Web TP 5',
+          dateDeb: 2024-11-13T10:00:00.000Z,
+          dateFin: 2024-11-13T11:30:00.000Z,
+          prof: 'VOISIN S.',
+          lieu: 'S.025',
+          nomTp: 'TP 5'
+        }
+        */
+        preparedEvent.push(event);
+      }
     }
+  }
 
+  return preparedEvent;
+};
 
-}
+// * Exports
+exports.prepareIcalForDB = prepareIcalForDB;
+exports.getIcalFromWeb = getIcalFromWeb;
 
+// ?
+// ? Exemples de données
+// ? 
 
-
-// iut info
-getIcalFromWeb("https://www.iutbayonne.univ-pau.fr/outils/edt/default/export?ID=361").then((res) => {
-    prepareIcalForDB(res)
-})
+/*
+iut info
+getIcalFromWeb(
+  "https://www.iutbayonne.univ-pau.fr/outils/edt/default/export?ID=361"
+).then((res) => {
+  prepareIcalForDB(res);
+});
 /*
 ADE6049555464654261796f6e6e65323032342d323032352832292d333830342d302d30: {
     type: 'VEVENT',
@@ -83,7 +134,7 @@ ADE6049555464654261796f6e6e65323032342d323032352832292d333830342d302d30: {
 //getIcalFromWeb("https://univ-pau-planning2024-25.hyperplanning.fr/hp/Telechargements/ical/Edt_L1_LLCER___EA.ics?version=2024.0.8.0&icalsecurise=5325F56562BE3FC2802FB022452E2B39DBD97A98D5DE32A67275D56B03D3D0D7F82E9676C6048CB0BD98298EA97C99C1&param=643d5b312e2e36325d2666683d3126663d3131303030")
 
 //getIcalFromWeb("https://univ-pau-planning2024-25.hyperplanning.fr/hp/Telechargements/ical/Edt_L1_LLCER___EA.ics?version=2024.0.8.0&icalsecurise=5325F56562BE3FC2802FB022452E2B39DBD97A98D5DE32A67275D56B03D3D0D7F82E9676C6048CB0BD98298EA97C99C1&param=643d5b312e2e36325d2666683d3126663d3131303030").then((res) => {
-  //  prepareIcalForDB(res)
+//  prepareIcalForDB(res)
 //})
 
 /*
