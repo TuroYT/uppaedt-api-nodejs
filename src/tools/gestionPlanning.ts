@@ -2,29 +2,22 @@
 ? Gestion des plannings
 */
 
+import ical from "ical";
 
-const ical = require("ical");
 
-//  Interfaces
-/* interface Cours {
-    id: Number;
-    groupId: Number;
-    nomCours: string;
-    dateDeb: Date;
-    dateFin: Date;
-    prof: string;
-    lieu: string;
-}
+
+
+/*
+* fetch du ical et le parse
 */
-
-const getIcalFromWeb = async (icalURL) => {
+export const getIcalFromWeb = async (icalURL : string) => {
   const reponse = await fetch(icalURL);
   const vcalendar = await reponse.text();
   const parsed = ical.parseICS(vcalendar);
   return parsed;
 };
 
-const prepareIcalForDB = (ical, groupId = 0) => {
+export const prepareIcalForDB = (ical : any, groupId = 0) => {
   let preparedEvent = [];
 
   // event Formating
@@ -38,7 +31,7 @@ const prepareIcalForDB = (ical, groupId = 0) => {
         // ! HyperPlanning ne fonctionne pas
         console.log("HyperPlanning non pris en chatge");
         continue;
-
+        /*
         let event = {
           groupId: 0,
           nomCours: string,
@@ -50,6 +43,7 @@ const prepareIcalForDB = (ical, groupId = 0) => {
         };
 
         console.log(ical[k].categories);
+        */
       } else {
         // * planning générique
 
@@ -98,9 +92,6 @@ const prepareIcalForDB = (ical, groupId = 0) => {
   return preparedEvent;
 };
 
-// * Exports
-exports.prepareIcalForDB = prepareIcalForDB;
-exports.getIcalFromWeb = getIcalFromWeb;
 
 // ?
 // ? Exemples de données

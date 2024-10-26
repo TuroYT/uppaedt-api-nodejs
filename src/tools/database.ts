@@ -16,34 +16,48 @@
 
 */
 
-const mysql = require("mysql");
-const { getIcalFromWeb, prepareIcalForDB } = require("./gestionPlanning");
-require("dotenv").config();
+import { Formation, Groupe } from "./interfaces";
+import mysql from "mysql";
+import { getIcalFromWeb, prepareIcalForDB } from "./gestionPlanning.js";
+import dotenv from 'dotenv';
+import { dbConfig } from "../configs/db.config"; // db config
+dotenv.config();
 
-// Récupération des variables d'environnement
-const DB_HOST = process.env.DB_HOST;
-const DB_USER = process.env.DB_USER;
-const DB_PASS = process.env.DB_PASS;
-const DB_NAME = process.env.DB_NAME;
 
-// Vérification des variables d'environnement
-if (!DB_HOST || !DB_USER || !DB_PASS || !DB_NAME) {
-  console.error("Missing environment variables. Please check the .env file.");
-  process.exit(1);
-}
+
+
 
 //  ! Création de la connexion à la base de données
 const pool = mysql.createPool({
-  host: DB_HOST,
-  user: DB_USER,
-  password: DB_PASS,
-  database: DB_NAME,
+  host: dbConfig.DB_HOST,
+  user: dbConfig.DB_USER,
+  password: dbConfig.DB_PASS,
+  database: dbConfig.DB_NAME,
 });
 
 
+// ! DoQuery
+export const DoQuery = (QUERY: string, PARAMETERS: any[] = []) => {
+  return new Promise((resolve, reject) => {
+    pool.query(QUERY, PARAMETERS, (err: any, results) => {
+      if (err) {
+        console.error(err);
+        reject(err);
+        return;
+      }
 
+      let toReturn = [];
 
-async function insertCourse(idGroupe, nomCours, dateDeb, dateFin, prof, lieu) {
+      for (let k in results) {
+        toReturn.push(results[k]);
+      }
+
+      resolve(toReturn);
+    });
+  });
+}
+
+async function insertCourse(idGroupe : string, nomCours : string, dateDeb : Date, dateFin : Date, prof : string, lieu : string) {
   const QUERY = `
         INSERT INTO \`uppaCours\` (\`idGroupe\`, \`nomCours\`, \`dateDeb\`, \`dateFin\`, \`prof\`, \`lieu\`)
         VALUES (?, ?, ?, ?, ?, ?);
@@ -53,7 +67,7 @@ async function insertCourse(idGroupe, nomCours, dateDeb, dateFin, prof, lieu) {
     pool.query(
       QUERY,
       [idGroupe, nomCours, dateDeb, dateFin, prof, lieu],
-      (err, results) => {
+      (err : any, results :any) => {
         if (err) {
           console.error("Error inserting course:", err);
           reject(err);
@@ -81,12 +95,12 @@ async function insertCourse(idGroupe, nomCours, dateDeb, dateFin, prof, lieu) {
 
  * 
  */
-const getAllFormation = async () => {
+export const getAllFormation = async () => {
   // * Récupération de toutes les formations
-  const QUERY = "SELECT * FROM 'uppaFormation' ORDER BY nom;";
+  const QUERY = "SELECT * FROM `uppaFormation` ORDER BY nom;";
 
   return new Promise((resolve, reject) => {
-    pool.query(QUERY, (err, results) => {
+    pool.query(QUERY, (err :any, results : Formation[]) => {
       if (err) {
         console.error(err);
         reject(err);
@@ -105,12 +119,12 @@ const getAllFormation = async () => {
  * @param {number} idFormation - The ID of the formation.
  * @returns {Promise<number>} A promise that resolves to the ID of the created group.
  */
-const addGroup = (idGroupe, nomGroupe, idFormation) => {
+const addGroup = (idGroupe : string, nomGroupe : string, idFormation : number) => {
   const QUERY =
     "INSERT INTO 'uppaGroupe' (idGroupe, nomGroupe, idFormation) VALUES (?, ?, ?);";
 
   return new Promise((resolve, reject) => {
-    pool.query(QUERY, [idGroupe, nomGroupe, idFormation], (err, results) => {
+    pool.query(QUERY, [idGroupe, nomGroupe, idFormation], (err : any, results :any) => {
       if (err) {
         console.error(err);
         reject(err);
@@ -132,7 +146,7 @@ const getAllGroups = () => {
   const QUERY = "SELECT * FROM 'uppaGroupe' ORDER BY nom;";
 
   return new Promise((resolve, reject) => {
-    pool.query(QUERY, (err, results) => {
+    pool.query(QUERY, (err :any, results : Groupe[]) => {
       if (err) {
         console.error(err);
         reject(err);
@@ -143,11 +157,11 @@ const getAllGroups = () => {
   });
 };
 
-const getGroupsFromFormation = (formationId) => {
+const getGroupsFromFormation = (formationId : number) => {
   const QUERY = "SELECT * from 'uppaGroupe' WHERE 'idFormation' = ?";
 
   return new Promise((resolve, reject) => {
-    pool.query(QUERY, [formationId], (err, results) => {
+    pool.query(QUERY, [formationId], (err : any, results : Groupe) => {
       if (err) {
         console.error(err);
         reject(err);
@@ -164,18 +178,18 @@ const getGroupsFromFormation = (formationId) => {
  * @param {formationId} formationId - The ID of the formation for which to retrieve the ICS link.
  * @returns {Promise<String>} A promise that resolves to the ICS link of the specified group.
  */
-const getIcsLinks = (formationId) => {
+const getIcsLinks = (formationId : number) => {
   const QUERY = "SELECT 'lienICS' FROM 'icsLink' WHERE idFormation = ? ;";
 
   return new Promise((resolve, reject) => {
-    pool.query(QUERY, [formationId], (err, results) => {
+    pool.query(QUERY, [formationId], (err : any, results : any) => {
       if (err) {
         console.error(err);
         reject(err);
         return;
       }
-      let toReturn = [];
-      results.map((ics) => {
+      let toReturn : string[] = [];
+      results.map((ics : any) => {
         toReturn.push(ics.lienICS);
       });
       resolve(toReturn);
@@ -204,7 +218,7 @@ const getAllIcsLinks = () => {
     `;
 
   return new Promise((resolve, reject) => {
-    pool.query(QUERY, (err, results) => {
+    pool.query(QUERY, (err :any, results :any) => {
       if (err) {
         console.error(err);
         reject(err);
@@ -229,31 +243,33 @@ const getAllIcsLinks = () => {
  * @property {boolean} error - Indicates if there was an error during synchronization.
  * @property {number} nbSynced - The total number of courses synchronized.
  */
-const syncPlannings = async () => {
+export const syncPlannings = async () => {
     let thereIsAnError = false;
-    global.totalSynced = 0;
+    (global as any).totalSynced = 0;
   // supprimer les cours futurs
   const QUERY = `
         DELETE FROM \`uppaCours\` WHERE \`dateDeb\` > NOW();
     `;
-  pool.query(QUERY, async (err, results) => {
+  pool.query(QUERY, async (err : any, results: any) => {
     if (err) {
       console.error("Error deleting future courses:", err);
       return;
     }
     console.log("Deleted future courses:", results.affectedRows);
   });
-  // * get all ics links
-  let icsLinks = await getAllIcsLinks();
-  let listGroup = [];
+  
 
-  const doSync = async () => { for (let i in icsLinks) {
+  const doSync = async () => { 
+    // * get all ics links
+    let icsLinks : any = await getAllIcsLinks()
+    let listGroup = [];
+    for (let i in icsLinks) {
     await getIcalFromWeb(icsLinks[i].lienICS)
-      .then((ical) => {
+      .then((ical : any) => {
         let parsedIcal = prepareIcalForDB(ical);
 
-        for (k in parsedIcal) {
-          currentCourse = parsedIcal[k];
+        for (let k in parsedIcal) {
+          let currentCourse = parsedIcal[k];
           const groupId = icsLinks[i].idFormation + "-" + currentCourse.nomTp;
 
           if (currentCourse.dateDeb > new Date()) {
@@ -265,16 +281,15 @@ const syncPlannings = async () => {
               currentCourse.dateFin,
               currentCourse.prof,
               currentCourse.lieu,
-              currentCourse.nomTp
             );
           }
         }
 
-        global.totalSynced += parsedIcal.length;
+        (global as any).totalSynced += parsedIcal.length;
         console.log(parsedIcal.length,  " courses synced")
 
       })
-      .catch((err) => {
+      .catch((err : any) => {
         console.log(err);
       })
       
@@ -287,12 +302,8 @@ const syncPlannings = async () => {
   })
   
 
-  return({error: thereIsAnError, nbSynced : global.totalSynced});
+  return({error: thereIsAnError, nbSynced : (global as any).totalSynced});
 };
 
 
 
-exports.getAllFormation = getAllFormation;
-exports.getAllGroups = getAllGroups;
-exports.getGroupsFromFormation = getGroupsFromFormation;
-//exports.getIcsLink = getIcsLink;
