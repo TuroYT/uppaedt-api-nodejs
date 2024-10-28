@@ -60,24 +60,6 @@ const DoQuery = (QUERY, PARAMETERS = []) => {
     });
 };
 exports.DoQuery = DoQuery;
-function insertCourse(idGroupe, nomCours, dateDeb, dateFin, prof, lieu) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const QUERY = `
-        INSERT INTO \`uppaCours\` (\`idGroupe\`, \`nomCours\`, \`dateDeb\`, \`dateFin\`, \`prof\`, \`lieu\`)
-        VALUES (?, ?, ?, ?, ?, ?);
-    `;
-        return new Promise((resolve, reject) => {
-            pool.query(QUERY, [idGroupe, nomCours, dateDeb, dateFin, prof, lieu], (err, results) => {
-                if (err) {
-                    console.error("Error inserting course:", err);
-                    reject(err);
-                    return;
-                }
-                resolve(results);
-            });
-        });
-    });
-}
 /**
  * Retrieves all formations from the database.
  *
@@ -248,29 +230,30 @@ const syncPlannings = () => __awaiter(void 0, void 0, void 0, function* () {
         let icsLinks = yield getAllIcsLinks();
         let listGroup = [];
         for (let i in icsLinks) {
-            yield (0, gestionPlanning_js_1.getIcalFromWeb)(icsLinks[i].lienICS)
-                .then((ical) => {
-                let parsedIcal = (0, gestionPlanning_js_1.prepareIcalForDB)(ical);
-                for (let k in parsedIcal) {
-                    let currentCourse = parsedIcal[k];
-                    const groupId = icsLinks[i].idFormation + "-" + currentCourse.nomTp;
-                    if (currentCourse.dateDeb > new Date()) {
-                        // idGroupe, nomCours, dateDeb, dateFin, prof, lieu
-                        insertCourse(groupId, currentCourse.nomCours, currentCourse.dateDeb, currentCourse.dateFin, currentCourse.prof, currentCourse.lieu);
-                    }
+            let ical = yield (0, gestionPlanning_js_1.getIcalFromWeb)(icsLinks[i].lienICS);
+            let parsedIcal = (0, gestionPlanning_js_1.prepareIcalForDB)(ical);
+            for (let k in parsedIcal) {
+                let currentCourse = parsedIcal[k];
+                if (currentCourse.dateDeb > new Date()) {
+                    (0, exports.DoQuery)("INSERT INTO `uppaCours`(`nomGroupe`, `nomCours`, `dateDeb`, `dateFin`, `prof`, `lieu`, `idFormation`) VALUES (? , ? , ? , ? , ?, ?, ?)", [
+                        currentCourse.nomTp,
+                        currentCourse.nomCours,
+                        currentCourse.dateDeb,
+                        currentCourse.dateFin,
+                        currentCourse.prof,
+                        currentCourse.lieu,
+                        icsLinks[i].idFormation,
+                    ]);
                 }
-                global.totalSynced += parsedIcal.length;
-                console.log(parsedIcal.length, " courses synced");
-            })
-                .catch((err) => {
-                console.log(err);
-            });
+            }
+            global.totalSynced += parsedIcal.length;
+            console.log(parsedIcal.length, " courses synced");
         }
     });
     yield doSync().catch((err) => {
         thereIsAnError = true;
         console.log(err);
     });
-    return ({ error: thereIsAnError, nbSynced: global.totalSynced });
+    return { error: thereIsAnError, nbSynced: global.totalSynced };
 });
 exports.syncPlannings = syncPlannings;

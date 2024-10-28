@@ -19,13 +19,9 @@
 import { Formation, Groupe } from "./interfaces";
 import mysql from "mysql";
 import { getIcalFromWeb, prepareIcalForDB } from "./gestionPlanning.js";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 import { dbConfig } from "../configs/db.config"; // db config
 dotenv.config();
-
-
-
-
 
 //  ! Création de la connexion à la base de données
 const pool = mysql.createPool({
@@ -34,7 +30,6 @@ const pool = mysql.createPool({
   password: dbConfig.DB_PASS,
   database: dbConfig.DB_NAME,
 });
-
 
 // ! DoQuery
 export const DoQuery = (QUERY: string, PARAMETERS: any[] = []) => {
@@ -55,29 +50,7 @@ export const DoQuery = (QUERY: string, PARAMETERS: any[] = []) => {
       resolve(toReturn);
     });
   });
-}
-
-async function insertCourse(idGroupe : string, nomCours : string, dateDeb : Date, dateFin : Date, prof : string, lieu : string) {
-  const QUERY = `
-        INSERT INTO \`uppaCours\` (\`idGroupe\`, \`nomCours\`, \`dateDeb\`, \`dateFin\`, \`prof\`, \`lieu\`)
-        VALUES (?, ?, ?, ?, ?, ?);
-    `;
-
-  return new Promise((resolve, reject) => {
-    pool.query(
-      QUERY,
-      [idGroupe, nomCours, dateDeb, dateFin, prof, lieu],
-      (err : any, results :any) => {
-        if (err) {
-          console.error("Error inserting course:", err);
-          reject(err);
-          return;
-        }
-        resolve(results);
-      }
-    );
-  });
-}
+};
 
 /**
  * Retrieves all formations from the database.
@@ -100,7 +73,7 @@ export const getAllFormation = async () => {
   const QUERY = "SELECT * FROM `uppaFormation` ORDER BY nom;";
 
   return new Promise((resolve, reject) => {
-    pool.query(QUERY, (err :any, results : Formation[]) => {
+    pool.query(QUERY, (err: any, results: Formation[]) => {
       if (err) {
         console.error(err);
         reject(err);
@@ -119,20 +92,24 @@ export const getAllFormation = async () => {
  * @param {number} idFormation - The ID of the formation.
  * @returns {Promise<number>} A promise that resolves to the ID of the created group.
  */
-const addGroup = (idGroupe : string, nomGroupe : string, idFormation : number) => {
+const addGroup = (idGroupe: string, nomGroupe: string, idFormation: number) => {
   const QUERY =
     "INSERT INTO 'uppaGroupe' (idGroupe, nomGroupe, idFormation) VALUES (?, ?, ?);";
 
   return new Promise((resolve, reject) => {
-    pool.query(QUERY, [idGroupe, nomGroupe, idFormation], (err : any, results :any) => {
-      if (err) {
-        console.error(err);
-        reject(err);
-        return;
+    pool.query(
+      QUERY,
+      [idGroupe, nomGroupe, idFormation],
+      (err: any, results: any) => {
+        if (err) {
+          console.error(err);
+          reject(err);
+          return;
+        }
+        // Return the ID of the created group
+        resolve(results.insertId);
       }
-      // Return the ID of the created group
-      resolve(results.insertId);
-    });
+    );
   });
 };
 
@@ -146,7 +123,7 @@ const getAllGroups = () => {
   const QUERY = "SELECT * FROM 'uppaGroupe' ORDER BY nom;";
 
   return new Promise((resolve, reject) => {
-    pool.query(QUERY, (err :any, results : Groupe[]) => {
+    pool.query(QUERY, (err: any, results: Groupe[]) => {
       if (err) {
         console.error(err);
         reject(err);
@@ -157,11 +134,11 @@ const getAllGroups = () => {
   });
 };
 
-const getGroupsFromFormation = (formationId : number) => {
+const getGroupsFromFormation = (formationId: number) => {
   const QUERY = "SELECT * from 'uppaGroupe' WHERE 'idFormation' = ?";
 
   return new Promise((resolve, reject) => {
-    pool.query(QUERY, [formationId], (err : any, results : Groupe) => {
+    pool.query(QUERY, [formationId], (err: any, results: Groupe) => {
       if (err) {
         console.error(err);
         reject(err);
@@ -178,18 +155,18 @@ const getGroupsFromFormation = (formationId : number) => {
  * @param {formationId} formationId - The ID of the formation for which to retrieve the ICS link.
  * @returns {Promise<String>} A promise that resolves to the ICS link of the specified group.
  */
-const getIcsLinks = (formationId : number) => {
+const getIcsLinks = (formationId: number) => {
   const QUERY = "SELECT 'lienICS' FROM 'icsLink' WHERE idFormation = ? ;";
 
   return new Promise((resolve, reject) => {
-    pool.query(QUERY, [formationId], (err : any, results : any) => {
+    pool.query(QUERY, [formationId], (err: any, results: any) => {
       if (err) {
         console.error(err);
         reject(err);
         return;
       }
-      let toReturn : string[] = [];
-      results.map((ics : any) => {
+      let toReturn: string[] = [];
+      results.map((ics: any) => {
         toReturn.push(ics.lienICS);
       });
       resolve(toReturn);
@@ -200,11 +177,11 @@ const getIcsLinks = (formationId : number) => {
 /**
  * Retrieves all active ICS links from the database.
  *
- * This function executes a SQL query to select `lienICS` and `idFormation` 
- * from the `icsLink` table, joining with the `uppaFormation` table to ensure 
+ * This function executes a SQL query to select `lienICS` and `idFormation`
+ * from the `icsLink` table, joining with the `uppaFormation` table to ensure
  * that only active formations (`estActif` = 1) are included.
  *
- * @returns {Promise<Object[]>} A promise that resolves to an array of objects, 
+ * @returns {Promise<Object[]>} A promise that resolves to an array of objects,
  * each containing `lienICS` and `idFormation` properties.
  *
  * @throws {Error} If there is an error executing the query, the promise is rejected with the error.
@@ -218,7 +195,7 @@ const getAllIcsLinks = () => {
     `;
 
   return new Promise((resolve, reject) => {
-    pool.query(QUERY, (err :any, results :any) => {
+    pool.query(QUERY, (err: any, results: any) => {
       if (err) {
         console.error(err);
         reject(err);
@@ -236,7 +213,7 @@ const getAllIcsLinks = () => {
  * 2. Retrieves all ICS links.
  * 3. Fetches and processes iCal data from each ICS link.
  * 4. Inserts new courses into the database if they are scheduled for the future.
- * 
+ *
  * @async
  * @function syncPlannings
  * @returns {Promise<Object>} An object containing an error flag and the number of synchronized courses.
@@ -244,66 +221,57 @@ const getAllIcsLinks = () => {
  * @property {number} nbSynced - The total number of courses synchronized.
  */
 export const syncPlannings = async () => {
-    let thereIsAnError = false;
-    (global as any).totalSynced = 0;
+  let thereIsAnError = false;
+  (global as any).totalSynced = 0;
   // supprimer les cours futurs
   const QUERY = `
         DELETE FROM \`uppaCours\` WHERE \`dateDeb\` > NOW();
     `;
-  pool.query(QUERY, async (err : any, results: any) => {
+  pool.query(QUERY, async (err: any, results: any) => {
     if (err) {
       console.error("Error deleting future courses:", err);
       return;
     }
     console.log("Deleted future courses:", results.affectedRows);
   });
-  
 
-  const doSync = async () => { 
+  const doSync = async () => {
     // * get all ics links
-    let icsLinks : any = await getAllIcsLinks()
+    let icsLinks: any = await getAllIcsLinks();
     let listGroup = [];
     for (let i in icsLinks) {
-    await getIcalFromWeb(icsLinks[i].lienICS)
-      .then((ical : any) => {
-        let parsedIcal = prepareIcalForDB(ical);
+      let ical = await getIcalFromWeb(icsLinks[i].lienICS);
 
-        for (let k in parsedIcal) {
-          let currentCourse = parsedIcal[k];
-          const groupId = icsLinks[i].idFormation + "-" + currentCourse.nomTp;
+      let parsedIcal = prepareIcalForDB(ical);
 
-          if (currentCourse.dateDeb > new Date()) {
-            // idGroupe, nomCours, dateDeb, dateFin, prof, lieu
-            insertCourse(
-              groupId,
+      for (let k in parsedIcal) {
+        let currentCourse = parsedIcal[k];
+
+        if (currentCourse.dateDeb > new Date()) {
+          DoQuery(
+            "INSERT INTO `uppaCours`(`nomGroupe`, `nomCours`, `dateDeb`, `dateFin`, `prof`, `lieu`, `idFormation`) VALUES (? , ? , ? , ? , ?, ?, ?)",
+            [
+              currentCourse.nomTp,
               currentCourse.nomCours,
               currentCourse.dateDeb,
               currentCourse.dateFin,
               currentCourse.prof,
               currentCourse.lieu,
-            );
-          }
+              icsLinks[i].idFormation,
+            ]
+          );
         }
+      }
 
-        (global as any).totalSynced += parsedIcal.length;
-        console.log(parsedIcal.length,  " courses synced")
-
-      })
-      .catch((err : any) => {
-        console.log(err);
-      })
-      
-      
-  }}
+      (global as any).totalSynced += parsedIcal.length;
+      console.log(parsedIcal.length, " courses synced");
+    }
+  };
 
   await doSync().catch((err) => {
     thereIsAnError = true;
-    console.log(err)
-  })
-  
+    console.log(err);
+  });
 
-  return({error: thereIsAnError, nbSynced : (global as any).totalSynced});
+  return { error: thereIsAnError, nbSynced: (global as any).totalSynced };
 };
-
-
-

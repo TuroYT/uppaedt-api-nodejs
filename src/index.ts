@@ -6,8 +6,8 @@
 
 // Importation des modules
 import express from 'express';
-import { retrieveAllFormations } from './routes/formations.routes.js';
-import { getPlanningfromIdGroupe, planningSyncAll } from './routes/plannings.route.js';
+import { getGroupsFromIdForamtion, retrieveAllFormations } from './routes/formations.routes.js';
+import { GetPlanningIdFomrationNomGroupe, planningSyncAll } from './routes/plannings.route.js';
 import bodyParser from 'body-parser';
 
 require('dotenv').config();
@@ -38,12 +38,12 @@ app.get('/', (req: express.Request, res: express.Response) => {
 
 // ? formations
 app.get('/formations/getAll', retrieveAllFormations)
-
+app.post('/formation/getGroups', getGroupsFromIdForamtion) // body : idFormation
 
 
 
 //? Plannigs
-app.post('/planning/getFromGroupeId', getPlanningfromIdGroupe) // body.idGroupe
+app.post('/planning/GetPlanningIdFomrationNomGroupe', GetPlanningIdFomrationNomGroupe) // body.nomGroupe, body.idFormation, body.rangeDate = 30, body.centerDate = new Date()
 app.get('/planning/syncAll', planningSyncAll)
 
 

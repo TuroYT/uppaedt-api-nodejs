@@ -33,8 +33,9 @@ app.get('/', (req, res) => {
 });
 // ? formations
 app.get('/formations/getAll', formations_routes_js_1.retrieveAllFormations);
+app.post('/formation/getGroups', formations_routes_js_1.getGroupsFromIdForamtion); // body : idFormation
 //? Plannigs
-app.post('/planning/getFromGroupeId', plannings_route_js_1.getPlanningfromIdGroupe); // body.idGroupe
+app.post('/planning/GetPlanningIdFomrationNomGroupe', plannings_route_js_1.GetPlanningIdFomrationNomGroupe); // body.nomGroupe, body.idFormation, body.rangeDate = 30, body.centerDate = new Date()
 app.get('/planning/syncAll', plannings_route_js_1.planningSyncAll);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
