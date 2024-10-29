@@ -13,7 +13,8 @@ export const retrieveAllFormations = (req : express.Request, res : express.Respo
 
 
 export const getGroupsFromIdForamtion = (req : express.Request, res : express.Response, next: express.NextFunction) => {
-    DoQuery('SELECT DISTINCT nomGroupe FROM `uppaCours` WHERE idFormation = ? ORDER BY nomGroupe ;', [req.body.idFormation])
+    console.log(req.body.idFormation)
+    DoQuery("SELECT DISTINCT nomGroupe FROM `uppaCours` WHERE idFormation = ? AND NOT `nomGroupe` = 'NA' ORDER BY nomGroupe ;", [req.body.idFormation])
     .then((result) => {
         res.send(result)
     })

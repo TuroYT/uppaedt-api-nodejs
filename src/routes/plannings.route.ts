@@ -13,7 +13,7 @@ export const GetPlanningIdFomrationNomGroupe = (req : express.Request, res : exp
     endDate.setDate(endDate.getDate() + Math.floor(rangeDate / 2));
     console.log(startDate, endDate)
     
-    DoQuery("SELECT * FROM `uppaCours` WHERE `nomGroupe` = ? AND `idFormation` = ? AND `dateDeb` BETWEEN ? AND ? ORDER BY `dateDeb`", [req.body.nomGroupe, req.body.idFormation, startDate, endDate])
+    DoQuery("SELECT * FROM `uppaCours` WHERE (`nomGroupe` = ? OR `nomGroupe` = 'NA') AND `idFormation` = ? AND `dateDeb` BETWEEN ? AND ? ORDER BY `dateDeb`", [req.body.nomGroupe, req.body.idFormation, startDate, endDate])
     .then((resQuery) => {
         res.json(resQuery)
     })
