@@ -44,4 +44,39 @@ Start the server:
 npm run start
 ```
 
+## API Endpoints
 
+The API provides the following endpoints:
+
+SOON
+
+## Environment Variables
+
+The following environment variables are required:
+
+- `DB_HOST`: The database host.
+- `DB_USER`: The database user.
+- `DB_PASS`: The database password.
+- `DB_NAME`: The database name.
+
+## Docker
+
+To run the project using Docker:
+
+1. Build the Docker image:
+    ```sh
+    docker build -t uppaedt-api .
+    ```
+
+2. Run the Docker container:
+    ```sh
+    docker run -d -p 3000:3000 --env-file .env uppaedt-api
+    ```
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request for any changes.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
