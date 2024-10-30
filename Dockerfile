@@ -3,15 +3,16 @@ FROM node:14
 
 # Create and change to the app directory
 WORKDIR /usr/src/app
-
+COPY src /usr/src/app
 # Copy package.json and package-lock.json
 COPY package*.json ./
+COPY tsconfig.json ./
 
 # Install dependencies
 RUN npm install
 
 # Copy the rest of the application code
-COPY . .
+
 
 # Compile TypeScript to JavaScript
 RUN npm run build
