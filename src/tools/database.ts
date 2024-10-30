@@ -31,6 +31,17 @@ const pool = mysql.createPool({
   database: dbConfig.DB_NAME,
 });
 
+// Establish a connection to the database
+pool.getConnection((err, connection) => {
+  if (err) {
+    console.error("Error connecting to the database:", err);
+    console.log(dbConfig.DB_HOST, dbConfig.DB_USER )
+    return;
+  }
+  console.log("Connected to the database", dbConfig.DB_HOST ,"with threadId:", connection.threadId);
+  connection.release();
+});
+
 // ! DoQuery
 export const DoQuery = (QUERY: string, PARAMETERS: any[] = []) => {
   return new Promise((resolve, reject) => {

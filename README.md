@@ -48,8 +48,7 @@ npm run start
 
 The API provides the following endpoints:
 
-SOON
-
+[<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://god.gw.postman.com/run-collection/39304512-01bcea13-bc2b-4313-8c6b-f2c44f851f21?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D39304512-01bcea13-bc2b-4313-8c6b-f2c44f851f21%26entityType%3Dcollection%26workspaceId%3Dbf2f2386-6fde-45d4-9655-7a3979abc5de)
 ## Environment Variables
 
 The following environment variables are required:
