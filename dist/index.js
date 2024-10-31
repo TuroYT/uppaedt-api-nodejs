@@ -13,12 +13,14 @@ const express_1 = __importDefault(require("express"));
 const formations_routes_js_1 = require("./routes/formations.routes.js");
 const plannings_route_js_1 = require("./routes/plannings.route.js");
 const body_parser_1 = __importDefault(require("body-parser"));
+const cors_1 = __importDefault(require("cors"));
 require('dotenv').config();
 const app = (0, express_1.default)();
 app.use(body_parser_1.default.json()); // to support JSON-encoded bodies
 app.use(body_parser_1.default.urlencoded({
     extended: true
 }));
+app.use((0, cors_1.default)());
 // LOGGING
 app.use((req, res, next) => {
     console.log(`${new Date} : ${req.method} request for '${req.url}' by ${req.headers['x-forwarded-for'] || req.socket.remoteAddress}`);

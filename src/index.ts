@@ -9,6 +9,7 @@ import express from 'express';
 import { getGroupsFromIdForamtion, retrieveAllFormations } from './routes/formations.routes.js';
 import { GetPlanningIdFomrationNomGroupe, planningSyncAll } from './routes/plannings.route.js';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 
 require('dotenv').config();
 
@@ -17,6 +18,7 @@ app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 })); 
+app.use(cors())
 
 
 // LOGGING
