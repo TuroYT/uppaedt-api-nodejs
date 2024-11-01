@@ -13,8 +13,7 @@ const retrieveAllFormations = (req, res, next) => {
 };
 exports.retrieveAllFormations = retrieveAllFormations;
 const getGroupsFromIdForamtion = (req, res, next) => {
-    console.log(req.body.idFormation);
-    (0, database_1.DoQuery)("SELECT DISTINCT nomGroupe FROM `uppaCours` WHERE idFormation = ? AND NOT `nomGroupe` = 'NA' ORDER BY nomGroupe ;", [req.body.idFormation])
+    (0, database_1.DoQuery)("SELECT DISTINCT nomGroupe, idFormation FROM `uppaCours` WHERE idFormation = ? AND NOT `nomGroupe` = 'NA' ORDER BY nomGroupe ;", [req.body.idFormation])
         .then((result) => {
         res.send(result);
     });

@@ -10,7 +10,10 @@ const GetPlanningIdFomrationNomGroupe = (req, res, next) => {
     startDate.setDate(startDate.getDate() - Math.floor(rangeDate / 2));
     endDate.setDate(endDate.getDate() + Math.floor(rangeDate / 2));
     console.log(startDate, endDate);
-    (0, database_1.DoQuery)("SELECT * FROM `uppaCours` WHERE (`nomGroupe` = ? OR `nomGroupe` = 'NA') AND `idFormation` = ? AND `dateDeb` BETWEEN ? AND ? ORDER BY `dateDeb`", [req.body.nomGroupe, req.body.idFormation, startDate, endDate])
+    // ! ne marche pas 
+    const nomGroupes = Array.isArray(req.body.nomGroupes) ? req.body.nomGroupes : [];
+    const idFormations = Array.isArray(req.body.idFormations) ? req.body.idFormations : [];
+    (0, database_1.DoQuery)("SELECT * FROM `uppaCours` WHERE (`nomGroupe` IN (?) OR `nomGroupe` = 'NA') AND `idFormation` IN (?) AND `dateDeb` BETWEEN ? AND ? ORDER BY `dateDeb`", [nomGroupes, idFormations, startDate, endDate])
         .then((resQuery) => {
         res.json(resQuery);
     });
