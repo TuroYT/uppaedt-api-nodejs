@@ -51,7 +51,7 @@ export const DoQuery = (QUERY: string, PARAMETERS: any[] = []) => {
         reject(err);
         return;
       }
-
+      console.log(QUERY, PARAMETERS)
       let toReturn = [];
 
       for (let k in results) {

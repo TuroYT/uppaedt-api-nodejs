@@ -61,6 +61,7 @@ const DoQuery = (QUERY, PARAMETERS = []) => {
                 reject(err);
                 return;
             }
+            console.log(QUERY, PARAMETERS);
             let toReturn = [];
             for (let k in results) {
                 toReturn.push(results[k]);

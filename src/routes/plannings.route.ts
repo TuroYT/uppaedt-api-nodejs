@@ -11,10 +11,13 @@ export const GetPlanningIdFomrationNomGroupe = (req : express.Request, res : exp
     let endDate = new Date(req.body.centerDate) || new Date();
     startDate.setDate(startDate.getDate() - Math.floor(rangeDate / 2));
     endDate.setDate(endDate.getDate() + Math.floor(rangeDate / 2));
-    console.log(startDate, endDate)
-    // ! ne marche pas 
-    const nomGroupes : string[] = Array.isArray(req.body.nomGroupes) ? req.body.nomGroupes : [];
-    const idFormations : string[] = Array.isArray(req.body.idFormations) ? req.body.idFormations : [];
+    
+    
+    // Recupaération des nomGroupes et idFormations
+    const nomGroupes  =  req.body.nomGroupes.split(',');
+    const idFormations = req.body.idFormations.split(',');
+    console.log(nomGroupes, idFormations)
+    
     DoQuery("SELECT * FROM `uppaCours` WHERE (`nomGroupe` IN (?) OR `nomGroupe` = 'NA') AND `idFormation` IN (?) AND `dateDeb` BETWEEN ? AND ? ORDER BY `dateDeb`", [nomGroupes, idFormations, startDate, endDate])
     .then((resQuery) => {
         res.json(resQuery)
