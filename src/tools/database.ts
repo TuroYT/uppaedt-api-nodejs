@@ -276,6 +276,16 @@ export const syncPlannings = async () => {
 
       (global as any).totalSynced += parsedIcal.length;
       console.log(parsedIcal.length, " courses synced");
+
+      // Remove duplicate courses with the same name and start date
+      await DoQuery(
+        `DELETE FROM uppaCours
+         WHERE idCours NOT IN (
+           SELECT MIN(idCours)
+           FROM uppaCours
+           GROUP BY nomCours, dateDeb
+         );`
+      );
     }
   };
 

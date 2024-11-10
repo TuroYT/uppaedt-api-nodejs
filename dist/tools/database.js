@@ -259,6 +259,8 @@ const syncPlannings = () => __awaiter(void 0, void 0, void 0, function* () {
             }
             global.totalSynced += parsedIcal.length;
             console.log(parsedIcal.length, " courses synced");
+            // Remove duplicate courses with the same name and start date
+            yield (0, exports.DoQuery)("DELETE c1 FROM `uppaCours` c1 INNER JOIN `uppaCours` c2 WHERE c1.idCours < c2.idCours AND c1.nomCours = c2.nomCours AND c1.dateDeb = c2.dateDeb;");
         }
     });
     yield doSync().catch((err) => {
