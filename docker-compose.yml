@@ -1,12 +1,13 @@
-version: '3.8'
-
 services:
   app:
-    image: turodev/UppaEdtV2
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
-      - DB_HOST=
-      - DB_USER=
-      - DB_PASS=
-      - DB_NAME=
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+    command: npm run start
