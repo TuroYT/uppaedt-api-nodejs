@@ -16,7 +16,7 @@ export const GetPlanningIdFomrationNomGroupe = (req : express.Request, res : exp
     // Recupaération des nomGroupes et idFormations
     const nomGroupes  =  req.body.nomGroupes.split(',');
     const idFormations = req.body.idFormations.split(',');
-    console.log(nomGroupes, idFormations)
+    
     
     DoQuery("SELECT * FROM `uppaCours` WHERE (`nomGroupe` IN (?) OR `nomGroupe` = 'NA') AND `idFormation` IN (?) AND `dateDeb` BETWEEN ? AND ? ORDER BY `dateDeb`", [nomGroupes, idFormations, startDate, endDate])
     .then((resQuery) => {
