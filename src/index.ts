@@ -33,7 +33,7 @@ app.use((req, res, next) => {
     * Description : Renvoie un message de bienvenue
 */
 app.get('/', (req: express.Request, res: express.Response) => {
-    res.send('UPPA - API REST <br> Auteur : Romain PINSOLLE <br> Site Web : https://romain-pinsolle.fr ');
+    res.send('UPPA - API REST <br> Auteur : Romain PINSOLLE <br> Site Web : romain-pinsolle.fr ');
 });
 
 

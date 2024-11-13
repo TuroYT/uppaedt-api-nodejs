@@ -35,10 +35,15 @@ const pool = mysql.createPool({
 pool.getConnection((err, connection) => {
   if (err) {
     console.error("Error connecting to the database:", err);
-    console.log(dbConfig.DB_HOST, dbConfig.DB_USER )
+    console.log(dbConfig.DB_HOST, dbConfig.DB_USER);
     return;
   }
-  console.log("Connected to the database", dbConfig.DB_HOST ,"with threadId:", connection.threadId);
+  console.log(
+    "Connected to the database",
+    dbConfig.DB_HOST,
+    "with threadId:",
+    connection.threadId
+  );
   connection.release();
 });
 
@@ -51,7 +56,7 @@ export const DoQuery = (QUERY: string, PARAMETERS: any[] = []) => {
         reject(err);
         return;
       }
-      console.log(QUERY, PARAMETERS)
+      console.log(QUERY, PARAMETERS);
       let toReturn = [];
 
       for (let k in results) {
