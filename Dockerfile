@@ -3,7 +3,7 @@ FROM node:20
 
 # Create and change to the app directory
 WORKDIR /usr/src/app
-COPY src /usr/src/app
+COPY . /usr/src/app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 COPY tsconfig.json ./
