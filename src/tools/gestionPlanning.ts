@@ -4,6 +4,7 @@
 
 import { info } from "console";
 import ical from "ical";
+import { DoQuery } from "./database";
 
 /*
  * fetch du ical et le parse
@@ -15,7 +16,7 @@ export const getIcalFromWeb = async (icalURL: string) => {
   return parsed;
 };
 
-export const prepareIcalForDB = (ical: any, groupId = 0) => {
+export const prepareIcalForDB = async (ical: any, groupId = 0) => {
   let preparedEvent = [];
 
   // event Formating
@@ -74,6 +75,26 @@ export const prepareIcalForDB = (ical: any, groupId = 0) => {
           nomTp: nomTp,
         };
 
+        try {
+          await DoQuery(
+            "INSERT INTO `uppaCours`(`nomGroupe`, `nomCours`, `dateDeb`, `dateFin`, `prof`, `lieu`, `idFormation`) VALUES (? , ? , ? , ? , ?, ?, ?)",
+            [
+              event.nomTp,
+              event.nomCours,
+              event.dateDeb,
+              event.dateFin,
+              event.prof,
+              event.lieu,
+              groupId,
+            ]
+          );
+        } catch (err) {
+          if ((err as any).code === 'ER_DUP_ENTRY') {
+            console.log('Duplicate entry, skipping:', event);
+          } else {
+            throw err;
+          }
+        }
 
         /*
 'Ferie-409-L1_LLCER_-_EA-Index-Education': {
@@ -145,6 +166,27 @@ export const prepareIcalForDB = (ical: any, groupId = 0) => {
           lieu: ical[k].location,
           nomTp: groupeTp,
         };
+
+        try {
+          await DoQuery(
+            "INSERT INTO `uppaCours`(`nomGroupe`, `nomCours`, `dateDeb`, `dateFin`, `prof`, `lieu`, `idFormation`) VALUES (? , ? , ? , ? , ?, ?, ?)",
+            [
+              event.nomTp,
+              event.nomCours,
+              event.dateDeb,
+              event.dateFin,
+              event.prof,
+              event.lieu,
+              groupId,
+            ]
+          );
+        } catch (err) {
+          if ((err as any).code === 'ER_DUP_ENTRY') {
+            console.log('Duplicate entry, skipping:', event);
+          } else {
+            throw err;
+          }
+        }
 
         // * Exemple
         /*

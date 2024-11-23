@@ -169,7 +169,7 @@ export const syncPlannings = async () => {
     for (let i in icsLinks) {
       let ical = await getIcalFromWeb(icsLinks[i].lienICS);
 
-      let parsedIcal = prepareIcalForDB(ical);
+      let parsedIcal = await prepareIcalForDB(ical);
 
       for (let k in parsedIcal) {
         let currentCourse = parsedIcal[k];
@@ -189,7 +189,11 @@ export const syncPlannings = async () => {
               ]
             );
           } catch (err) {
-            
+            if ((err as any).code === 'ER_DUP_ENTRY') {
+              console.log('Duplicate entry, skipping:', currentCourse);
+            } else {
+              throw err;
+            }
           }
         }
       }
