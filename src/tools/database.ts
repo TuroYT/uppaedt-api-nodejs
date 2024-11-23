@@ -53,7 +53,7 @@ export const DoQuery = (QUERY: string, PARAMETERS: any[] = []) => {
     pool.query(QUERY, PARAMETERS, (err: any, results) => {
       if (err) {
         console.error(err);
-        reject(err);
+        //reject(err);
         return;
       }
 
@@ -175,32 +175,29 @@ export const syncPlannings = async () => {
         let currentCourse = parsedIcal[k];
 
         if (currentCourse.dateDeb > new Date()) {
-          DoQuery(
-            "INSERT INTO `uppaCours`(`nomGroupe`, `nomCours`, `dateDeb`, `dateFin`, `prof`, `lieu`, `idFormation`) VALUES (? , ? , ? , ? , ?, ?, ?)",
-            [
-              currentCourse.nomTp,
-              currentCourse.nomCours,
-              currentCourse.dateDeb,
-              currentCourse.dateFin,
-              currentCourse.prof,
-              currentCourse.lieu,
-              icsLinks[i].idFormation,
-            ]
-          );
+          try {
+            await DoQuery(
+              "INSERT INTO `uppaCours`(`nomGroupe`, `nomCours`, `dateDeb`, `dateFin`, `prof`, `lieu`, `idFormation`) VALUES (? , ? , ? , ? , ?, ?, ?)",
+              [
+                currentCourse.nomTp,
+                currentCourse.nomCours,
+                currentCourse.dateDeb,
+                currentCourse.dateFin,
+                currentCourse.prof,
+                currentCourse.lieu,
+                icsLinks[i].idFormation,
+              ]
+            );
+          } catch (err) {
+            
+          }
         }
       }
 
       (global as any).totalSynced += parsedIcal.length;
       console.log(parsedIcal.length, " courses synced");
     }
-    DoQuery(
-      `DELETE FROM uppaCours
-       WHERE idCours NOT IN (
-         SELECT MIN(idCours)
-         FROM uppaCours
-         GROUP BY nomCours, dateDeb
-       );`
-    );
+
   };
 
   await doSync().catch((err) => {
