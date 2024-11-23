@@ -2,22 +2,20 @@
 ? Gestion des plannings
 */
 
+import { info } from "console";
 import ical from "ical";
 
-
-
-
 /*
-* fetch du ical et le parse
-*/
-export const getIcalFromWeb = async (icalURL : string) => {
+ * fetch du ical et le parse
+ */
+export const getIcalFromWeb = async (icalURL: string) => {
   const reponse = await fetch(icalURL);
   const vcalendar = await reponse.text();
   const parsed = ical.parseICS(vcalendar);
   return parsed;
 };
 
-export const prepareIcalForDB = (ical : any, groupId = 0) => {
+export const prepareIcalForDB = (ical: any, groupId = 0) => {
   let preparedEvent = [];
 
   // event Formating
@@ -28,21 +26,97 @@ export const prepareIcalForDB = (ical : any, groupId = 0) => {
       if (ical[k].categories) {
         // le planning est au format hyperplanning
 
+        let groupId;
+        let nomCours;
+        let dateDeb = new Date(ical[k].start);
+        let dateFin = new Date(ical[k].end);
+        let prof = "NA";
+        let lieu = "NA";
+        let nomTp = "NA";
         // ! HyperPlanning ne fonctionne pas
-        console.log("HyperPlanning non pris en chatge");
-        continue;
-        /*
+        if (!ical[k].description) {
+          // ferie
+          nomCours = ical[k].summary.val
+        } else {
+          // général
+          let infos: string[] = ical[k]["ALT-DESC"]["val"].split("<br/>")
+          let arrInfos = []
+
+          let temp = []
+        infos.map((info, index) => {
+          temp.push(info.split(" : "))
+          if (temp[index][0] === "Options") {
+
+
+            // ! a finir
+            temp[index][1] = temp[index][1].split(",")
+          }
+
+        })
+
+
+
+          
+
+          //console.log(infos)
+
+
+
+        }
+
         let event = {
-          groupId: 0,
-          nomCours: string,
-          dateDeb: new Date(ical[k].start),
-          dateFin: new Date(ical[k].end),
-          prof: string,
-          lieu: string,
-          nomTp: string,
+          groupId: groupId,
+          nomCours: nomCours,
+          dateDeb: dateDeb,
+          dateFin: dateFin,
+          prof: prof,
+          lieu: lieu,
+          nomTp: nomTp,
         };
 
-        console.log(ical[k].categories);
+
+        /*
+'Ferie-409-L1_LLCER_-_EA-Index-Education': {
+    type: 'VEVENT',
+    params: [],
+    categories: [ 'HYPERPLANNING' ],
+    dtstamp: 2024-10-16T14:29:42.000Z { tz: undefined },
+    uid: 'Ferie-409-L1_LLCER_-_EA-Index-Education',
+    start: 2025-08-14T22:00:00.000Z { tz: undefined, dateOnly: true },
+    end: 2025-08-15T22:00:00.000Z { tz: undefined, dateOnly: true },
+    summary: { params: [Object], val: 'Férié' }
+  }
+
+  'Cours-42028-9-L1_LLCER_-_EA-Index-Education': {
+    type: 'VEVENT',
+    params: [],
+    categories: [ 'HYPERPLANNING' ],
+    dtstamp: 2024-10-16T14:31:29.000Z { tz: undefined },
+    lastmodified: 2024-09-04T07:51:35.000Z { tz: undefined },
+    uid: 'Cours-42028-9-L1_LLCER_-_EA-Index-Education',
+    start: 2024-10-21T11:30:00.000Z { tz: undefined },
+    end: 2024-10-21T13:00:00.000Z { tz: undefined },
+    summary: {
+      params: [Object],
+      val: 'Découverte CM Lettres S1, Découverte CM Lettres S1 - Découverte Lettres S1 - ANDREUCCI - Cours'
+    },
+    location: { params: [Object], val: 'Amphi 2 (LET-00)' },
+    description: {
+      params: [Object],
+      val: 'Options : Découverte CM Lettres S1, Découverte CM Lettres S1\n' +
+        'Matière : Découverte Lettres S1\n' +
+        'Enseignant : ANDREUCCI\n' +
+        'Type : Cours\n' +
+        'Salle : Amphi 2 (LET-00)\n'
+    },
+    'ALT-DESC': {
+      params: [Object],
+      val: 'Options : Découverte CM Lettres S1, Découverte CM Lettres S1<br/>Matière : Découverte Lettres S1<br/>Enseignant : ANDREUCCI<br/>Type : Cours<br/>Salle : Amphi 2 (LET-00)<br/>'
+    }
+  },
+
+
+
         */
       } else {
         // * planning générique
@@ -92,10 +166,9 @@ export const prepareIcalForDB = (ical : any, groupId = 0) => {
   return preparedEvent;
 };
 
-
 // ?
 // ? Exemples de données
-// ? 
+// ?
 
 /*
 iut info
@@ -122,8 +195,8 @@ ADE6049555464654261796f6e6e65323032342d323032352832292d333830342d302d30: {
 */
 
 // LLCER
-//getIcalFromWeb("https://univ-pau-planning2024-25.hyperplanning.fr/hp/Telechargements/ical/Edt_L1_LLCER___EA.ics?version=2024.0.8.0&icalsecurise=5325F56562BE3FC2802FB022452E2B39DBD97A98D5DE32A67275D56B03D3D0D7F82E9676C6048CB0BD98298EA97C99C1&param=643d5b312e2e36325d2666683d3126663d3131303030")
-
+let testical = getIcalFromWeb("https://univ-pau-planning2024-25.hyperplanning.fr/hp/Telechargements/ical/Edt_L1_LLCER___EA.ics?version=2024.0.8.0&icalsecurise=5325F56562BE3FC2802FB022452E2B39DBD97A98D5DE32A67275D56B03D3D0D7F82E9676C6048CB0BD98298EA97C99C1&param=643d5b312e2e36325d2666683d3126663d3131303030")
+prepareIcalForDB(testical)
 //getIcalFromWeb("https://univ-pau-planning2024-25.hyperplanning.fr/hp/Telechargements/ical/Edt_L1_LLCER___EA.ics?version=2024.0.8.0&icalsecurise=5325F56562BE3FC2802FB022452E2B39DBD97A98D5DE32A67275D56B03D3D0D7F82E9676C6048CB0BD98298EA97C99C1&param=643d5b312e2e36325d2666683d3126663d3131303030").then((res) => {
 //  prepareIcalForDB(res)
 //})
