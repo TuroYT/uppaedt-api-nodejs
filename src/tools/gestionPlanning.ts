@@ -49,7 +49,7 @@ export const prepareIcalForDB = (ical: any, groupId = 0) => {
 
 
             // ! a finir
-            temp[index][1] = temp[index][1].split(",")
+            //temp[index][1] = temp[index][1].split(",")
           }
 
         })
