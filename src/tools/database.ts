@@ -192,7 +192,8 @@ export const syncPlannings = async () => {
             if ((err as any).code === 'ER_DUP_ENTRY') {
               console.log('Duplicate entry, skipping:', currentCourse);
             } else {
-              throw err;
+              console.error('Error inserting course:', currentCourse, err);
+              thereIsAnError = true;
             }
           }
         }
