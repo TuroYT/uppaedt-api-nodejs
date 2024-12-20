@@ -5,12 +5,19 @@
 import { info } from "console";
 import ical from "ical";
 import { DoQuery } from "./database";
+import https from "https";
+import fetch from "node-fetch";
 
 /*
  * fetch du ical et le parse
  */
 export const getIcalFromWeb = async (icalURL: string) => {
-  const reponse = await fetch(icalURL);
+
+  const httpsAgent = new https.Agent({
+    rejectUnauthorized: false,
+  });
+
+  const reponse = await fetch(icalURL, {agent: httpsAgent,});
   const vcalendar = await reponse.text();
   const parsed = ical.parseICS(vcalendar);
   return parsed;
