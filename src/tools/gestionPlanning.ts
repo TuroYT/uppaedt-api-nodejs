@@ -12,13 +12,12 @@ import fetch from "node-fetch";
  * fetch du ical et le parse
  */
 export const getIcalFromWeb = async (icalURL: string) => {
-
   const httpsAgent = new https.Agent({
-    rejectUnauthorized: false,
+    rejectUnauthorized: false,  
   });
 
-  const reponse = await fetch(icalURL, {agent: httpsAgent,});
-  const vcalendar = await reponse.text();
+  const response = await fetch(icalURL, { agent: httpsAgent });
+  const vcalendar = await response.text();
   const parsed = ical.parseICS(vcalendar);
   return parsed;
 };
