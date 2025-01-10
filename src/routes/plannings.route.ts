@@ -16,12 +16,34 @@ export const GetPlanningIdFomrationNomGroupe = (req : express.Request, res : exp
     // Recupaération des nomGroupes et idFormations
     const nomGroupes  =  req.body.nomGroupes.split(',');
     const idFormations = req.body.idFormations.split(',');
+
+    // récupération si il y a des profs
+    if (req.body.profs === undefined){
+        req.body.profs = ''
+    }
+    const profs = req.body.profs.split(',');
+    console.log(profs.length, profs)
+
+    // il existe des profs dans la requête
+    if (profs[0] !== ''){
+        DoQuery("SELECT * FROM `uppaCours` WHERE `prof` IN (?) AND `dateDeb` BETWEEN ? AND ? ORDER BY `dateDeb`", [profs, startDate, endDate])
+        .then((resQuery) => {
+            res.json(resQuery)
+        })
+
+
+    } else {
+        DoQuery("SELECT * FROM `uppaCours` WHERE (`nomGroupe` IN (?) OR `nomGroupe` = 'NA') AND `idFormation` IN (?) AND `dateDeb` BETWEEN ? AND ? ORDER BY `dateDeb`", [nomGroupes, idFormations, startDate, endDate])
+        .then((resQuery) => {
+            res.json(resQuery)
+        })
     
     
-    DoQuery("SELECT * FROM `uppaCours` WHERE (`nomGroupe` IN (?) OR `nomGroupe` = 'NA') AND `idFormation` IN (?) AND `dateDeb` BETWEEN ? AND ? ORDER BY `dateDeb`", [nomGroupes, idFormations, startDate, endDate])
-    .then((resQuery) => {
-        res.json(resQuery)
-    })
+    }
+
+    
+    
+    
 }
 
 // * route '/planning/syncAll'

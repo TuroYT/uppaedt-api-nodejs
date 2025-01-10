@@ -10,6 +10,7 @@ import { getGroupsFromIdForamtion, retrieveAllFormations } from './routes/format
 import { GetPlanningIdFomrationNomGroupe, planningSyncAll } from './routes/plannings.route.js';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import { getProfs } from './routes/autres.routes.js';
 
 require('dotenv').config();
 
@@ -42,7 +43,8 @@ app.get('/', (req: express.Request, res: express.Response) => {
 app.get('/formations/getAll', retrieveAllFormations)
 app.post('/formation/getGroups', getGroupsFromIdForamtion) // body : idFormation
 
-
+//? Autres
+app.get('/getProfs', getProfs)
 
 //? Plannigs
 app.post('/planning/GetPlanningIdFomrationNomGroupe', GetPlanningIdFomrationNomGroupe) // body.nomGroupe, body.idFormation, body.rangeDate = 30, body.centerDate = new Date()
