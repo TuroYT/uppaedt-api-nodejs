@@ -33,9 +33,21 @@ export const GetPlanningIdFomrationNomGroupe = (req : express.Request, res : exp
 
 
     } else {
-        DoQuery("SELECT * FROM `uppaCours` WHERE (`nomGroupe` IN (?) OR `nomGroupe` = 'NA') AND `idFormation` IN (?) AND `dateDeb` BETWEEN ? AND ? ORDER BY `dateDeb`", [nomGroupes, idFormations, startDate, endDate])
-        .then((resQuery) => {
-            res.json(resQuery)
+        // verif si la liste est vide
+        if (nomGroupes[0] === ''){
+            res.json([])
+            return
+        }
+
+        // récupération des cours par groupe et formation
+        const promises = nomGroupes.map((nomGroupe: string, index : number) => {
+            return DoQuery("SELECT * FROM `uppaCours` WHERE (`nomGroupe` = ? OR `nomGroupe` = 'NA') AND `idFormation` = ? AND `dateDeb` BETWEEN ? AND ? ORDER BY `dateDeb`", [nomGroupe, idFormations[index], startDate, endDate]);
+        });
+
+        Promise.all(promises)
+        .then((results) => {
+            const combinedResults = results.flat();
+            res.json(combinedResults);
         })
     
     

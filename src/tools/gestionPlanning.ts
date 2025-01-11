@@ -32,7 +32,7 @@ export const prepareIcalForDB = async (ical: any, groupId = 0) => {
       // Verif HyperPlanning
       if (ical[k].categories) {
         // le planning est au format hyperplanning
-
+        /*
         let groupId;
         let nomCours;
         let dateDeb = new Date(ical[k].start);
@@ -243,8 +243,7 @@ ADE6049555464654261796f6e6e65323032342d323032352832292d333830342d302d30: {
 */
 
 // LLCER
-let testical = getIcalFromWeb("https://univ-pau-planning2024-25.hyperplanning.fr/hp/Telechargements/ical/Edt_L1_LLCER___EA.ics?version=2024.0.8.0&icalsecurise=5325F56562BE3FC2802FB022452E2B39DBD97A98D5DE32A67275D56B03D3D0D7F82E9676C6048CB0BD98298EA97C99C1&param=643d5b312e2e36325d2666683d3126663d3131303030")
-prepareIcalForDB(testical)
+
 //getIcalFromWeb("https://univ-pau-planning2024-25.hyperplanning.fr/hp/Telechargements/ical/Edt_L1_LLCER___EA.ics?version=2024.0.8.0&icalsecurise=5325F56562BE3FC2802FB022452E2B39DBD97A98D5DE32A67275D56B03D3D0D7F82E9676C6048CB0BD98298EA97C99C1&param=643d5b312e2e36325d2666683d3126663d3131303030").then((res) => {
 //  prepareIcalForDB(res)
 //})
