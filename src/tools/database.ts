@@ -165,7 +165,6 @@ export const syncPlannings = async () => {
   const doSync = async () => {
     // * get all ics links
     let icsLinks: any = await getAllIcsLinks();
-    let listGroup = [];
     for (let i in icsLinks) {
       let ical = await getIcalFromWeb(icsLinks[i].lienICS);
 
@@ -205,10 +204,14 @@ export const syncPlannings = async () => {
 
   };
 
-  await doSync().catch((err) => {
+  await doSync()
+  .catch((err) => {
     thereIsAnError = true;
     console.log(err);
-  });
+  })
+  .then(() => {
+    DoQuery("DELETE FROM uppaCours WHERE idCours NOT IN ( SELECT MIN(idCours) FROM uppaCours GROUP BY nomCours, dateDeb )");
+  })
 
   return { error: thereIsAnError, nbSynced: (global as any).totalSynced };
 };

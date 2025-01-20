@@ -22,7 +22,7 @@ export const getIcalFromWeb = async (icalURL: string) => {
   return parsed;
 };
 
-export const prepareIcalForDB = async (ical: any, groupId = 0) => {
+export const prepareIcalForDB = async (ical: any) => {
   let preparedEvent = [];
 
   // event Formating
@@ -31,120 +31,9 @@ export const prepareIcalForDB = async (ical: any, groupId = 0) => {
     if (ical[k].type === "VEVENT") {
       // Verif HyperPlanning
       if (ical[k].categories) {
-        // le planning est au format hyperplanning
-        /*
-        let groupId;
-        let nomCours;
-        let dateDeb = new Date(ical[k].start);
-        let dateFin = new Date(ical[k].end);
-        let prof = "NA";
-        let lieu = "NA";
-        let nomTp = "NA";
-        // ! HyperPlanning ne fonctionne pas
-        if (!ical[k].description) {
-          // ferie
-          nomCours = ical[k].summary.val
-        } else {
-          // général
-          let infos: string[] = ical[k]["ALT-DESC"]["val"].split("<br/>")
-          let arrInfos = []
 
-          let temp = []
-        infos.map((info, index) => {
-          temp.push(info.split(" : "))
-          if (temp[index][0] === "Options") {
-
-
-            // ! a finir
-            //temp[index][1] = temp[index][1].split(",")
-          }
-
-        })
-
-
-
-          
-
-          //console.log(infos)
-
-
-
-        }
-
-        let event = {
-          groupId: groupId,
-          nomCours: nomCours,
-          dateDeb: dateDeb,
-          dateFin: dateFin,
-          prof: prof,
-          lieu: lieu,
-          nomTp: nomTp,
-        };
-
-        try {
-          await DoQuery(
-            "INSERT INTO `uppaCours`(`nomGroupe`, `nomCours`, `dateDeb`, `dateFin`, `prof`, `lieu`, `idFormation`) VALUES (? , ? , ? , ? , ?, ?, ?)",
-            [
-              event.nomTp,
-              event.nomCours,
-              event.dateDeb,
-              event.dateFin,
-              event.prof,
-              event.lieu,
-              groupId,
-            ]
-          );
-        } catch (err) {
-          if ((err as any).code === 'ER_DUP_ENTRY') {
-            console.log('Duplicate entry, skipping:', event);
-          } else {
-            throw err;
-          }
-        }
-
-        /*
-'Ferie-409-L1_LLCER_-_EA-Index-Education': {
-    type: 'VEVENT',
-    params: [],
-    categories: [ 'HYPERPLANNING' ],
-    dtstamp: 2024-10-16T14:29:42.000Z { tz: undefined },
-    uid: 'Ferie-409-L1_LLCER_-_EA-Index-Education',
-    start: 2025-08-14T22:00:00.000Z { tz: undefined, dateOnly: true },
-    end: 2025-08-15T22:00:00.000Z { tz: undefined, dateOnly: true },
-    summary: { params: [Object], val: 'Férié' }
-  }
-
-  'Cours-42028-9-L1_LLCER_-_EA-Index-Education': {
-    type: 'VEVENT',
-    params: [],
-    categories: [ 'HYPERPLANNING' ],
-    dtstamp: 2024-10-16T14:31:29.000Z { tz: undefined },
-    lastmodified: 2024-09-04T07:51:35.000Z { tz: undefined },
-    uid: 'Cours-42028-9-L1_LLCER_-_EA-Index-Education',
-    start: 2024-10-21T11:30:00.000Z { tz: undefined },
-    end: 2024-10-21T13:00:00.000Z { tz: undefined },
-    summary: {
-      params: [Object],
-      val: 'Découverte CM Lettres S1, Découverte CM Lettres S1 - Découverte Lettres S1 - ANDREUCCI - Cours'
-    },
-    location: { params: [Object], val: 'Amphi 2 (LET-00)' },
-    description: {
-      params: [Object],
-      val: 'Options : Découverte CM Lettres S1, Découverte CM Lettres S1\n' +
-        'Matière : Découverte Lettres S1\n' +
-        'Enseignant : ANDREUCCI\n' +
-        'Type : Cours\n' +
-        'Salle : Amphi 2 (LET-00)\n'
-    },
-    'ALT-DESC': {
-      params: [Object],
-      val: 'Options : Découverte CM Lettres S1, Découverte CM Lettres S1<br/>Matière : Découverte Lettres S1<br/>Enseignant : ANDREUCCI<br/>Type : Cours<br/>Salle : Amphi 2 (LET-00)<br/>'
-    }
-  },
-
-
-
-        */
+        // ! le planning est au format hyperplanning
+      
       } else {
         // * planning générique
 
@@ -164,7 +53,6 @@ export const prepareIcalForDB = async (ical: any, groupId = 0) => {
         }
 
         let event = {
-          groupId: groupId,
           nomCours: ical[k].summary,
           dateDeb: new Date(ical[k].start),
           dateFin: new Date(ical[k].end),
@@ -173,39 +61,6 @@ export const prepareIcalForDB = async (ical: any, groupId = 0) => {
           nomTp: groupeTp,
         };
 
-        try {
-          await DoQuery(
-            "INSERT INTO `uppaCours`(`nomGroupe`, `nomCours`, `dateDeb`, `dateFin`, `prof`, `lieu`, `idFormation`) VALUES (? , ? , ? , ? , ?, ?, ?)",
-            [
-              event.nomTp,
-              event.nomCours,
-              event.dateDeb,
-              event.dateFin,
-              event.prof,
-              event.lieu,
-              groupId,
-            ]
-          );
-        } catch (err) {
-          if ((err as any).code === 'ER_DUP_ENTRY') {
-            console.log('Duplicate entry, skipping:', event);
-          } else {
-            throw err;
-          }
-        }
-
-        // * Exemple
-        /*
-        {
-          groupId: 1,
-          nomCours: 'R1.02 - Interfaces Web TP 5',
-          dateDeb: 2024-11-13T10:00:00.000Z,
-          dateFin: 2024-11-13T11:30:00.000Z,
-          prof: 'VOISIN S.',
-          lieu: 'S.025',
-          nomTp: 'TP 5'
-        }
-        */
         preparedEvent.push(event);
       }
     }
