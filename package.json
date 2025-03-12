@@ -20,14 +20,15 @@
     "https": "^1.0.0",
     "ical": "^0.8.0",
     "mysql": "^2.18.1",
-    "node-fetch": "2.6.6",
+    "node-cron": "^3.0.3",
+    "node-fetch": "^2.7.0",
     "typescript": "^5.6.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/mysql": "^2.15.26",
-    "@types/node-fetch": "^2.6.12",
-    "jest": "^29.7.0"
+    "@types/node-cron": "^3.0.11",
+    "@types/node-fetch": "^2.6.12"
   }
 }
