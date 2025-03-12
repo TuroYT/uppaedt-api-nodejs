@@ -11,6 +11,8 @@ import { GetPlanningIdFomrationNomGroupe, planningSyncAll } from './routes/plann
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import { getProfs } from './routes/autres.routes.js';
+import cron from 'node-cron';
+import { syncPlannings } from './tools/database.js';
 
 require('dotenv').config();
 
@@ -34,7 +36,7 @@ app.use((req, res, next) => {
     * Description : Renvoie un message de bienvenue
 */
 app.get('/', (req: express.Request, res: express.Response) => {
-    res.send('UPPA - API REST <br> Auteur : Romain PINSOLLE <br> Site Web : romain-pinsolle.fr <br> modif du 23/11/2024 - 1');
+    res.send('UPPA - API REST <br> Auteur : Romain PINSOLLE <br> Site Web : romain-pinsolle.fr <br> modif du 12/03/2025 <br><br> <a href="/planning/syncAll">Syncro manuelle</a>');
 });
 
 
@@ -51,9 +53,14 @@ app.post('/planning/GetPlanningIdFomrationNomGroupe', GetPlanningIdFomrationNomG
 app.get('/planning/syncAll', planningSyncAll)
 
 
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+    cron.schedule('0 2 * * *', () => {
+        console.log('Running syncAll at 2AM');
+        syncPlannings();
+    });
 });
 
 

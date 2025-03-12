@@ -28,7 +28,7 @@ const pool = mysql.createPool({
   host: dbConfig.DB_HOST,
   user: dbConfig.DB_USER,
   password: dbConfig.DB_PASS,
-  database: dbConfig.DB_NAME,
+  database: dbConfig.DB_NAME
 });
 
 // Establish a connection to the database
@@ -38,12 +38,7 @@ pool.getConnection((err, connection) => {
     console.log(dbConfig.DB_HOST, dbConfig.DB_USER);
     return;
   }
-  console.log(
-    "Connected to the database",
-    dbConfig.DB_HOST,
-    "with threadId:",
-    connection.threadId
-  );
+  console.log("Connected to the database", dbConfig.DB_HOST, "with threadId:", connection.threadId);
   connection.release();
 });
 
@@ -100,7 +95,6 @@ export const getAllFormation = async () => {
   });
 };
 
-
 /**
  * Retrieves all active ICS links from the database.
  *
@@ -150,17 +144,15 @@ const getAllIcsLinks = () => {
 export const syncPlannings = async () => {
   let thereIsAnError = false;
   (global as any).totalSynced = 0;
-  // supprimer les cours futurs
-  const QUERY = `
-        DELETE FROM \`uppaCours\` WHERE \`dateDeb\` > NOW();
-    `;
-  pool.query(QUERY, async (err: any, results: any) => {
-    if (err) {
-      console.error("Error deleting future courses:", err);
-      return;
-    }
-    console.log("Deleted future courses:", results.affectedRows);
-  });
+      // supprimer les cours 
+      pool.query("DELETE FROM `uppaCours` WHERE `dateDeb` > NOW();", async (err: any, results: any) => {
+        if (err) {
+          console.error("Error deleting future courses:", err);
+          return;
+        }
+        console.log("Deleted future courses:", results.affectedRows);
+      });
+
 
   const doSync = async () => {
     // * get all ics links
@@ -169,6 +161,8 @@ export const syncPlannings = async () => {
       let ical = await getIcalFromWeb(icsLinks[i].lienICS);
 
       let parsedIcal = await prepareIcalForDB(ical);
+
+
 
       for (let k in parsedIcal) {
         let currentCourse = parsedIcal[k];
@@ -184,14 +178,14 @@ export const syncPlannings = async () => {
                 currentCourse.dateFin,
                 currentCourse.prof,
                 currentCourse.lieu,
-                icsLinks[i].idFormation,
+                icsLinks[i].idFormation
               ]
             );
           } catch (err) {
-            if ((err as any).code === 'ER_DUP_ENTRY') {
-              console.log('Duplicate entry, skipping:', currentCourse);
+            if ((err as any).code === "ER_DUP_ENTRY") {
+              console.log("Duplicate entry, skipping:", currentCourse);
             } else {
-              console.error('Error inserting course:', currentCourse, err);
+              console.error("Error inserting course:", currentCourse, err);
               thereIsAnError = true;
             }
           }
@@ -201,17 +195,19 @@ export const syncPlannings = async () => {
       (global as any).totalSynced += parsedIcal.length;
       console.log(parsedIcal.length, " courses synced");
     }
-
   };
 
   await doSync()
-  .catch((err) => {
-    thereIsAnError = true;
-    console.log(err);
-  })
-  .then(() => {
-    DoQuery("DELETE FROM uppaCours WHERE idCours NOT IN ( SELECT MIN(idCours) FROM uppaCours GROUP BY nomCours, dateDeb )");
-  })
+    .catch((err) => {
+      thereIsAnError = true;
+      console.log(err);
+    })
+    .then(() => {
+      // supprimer les doublons
+      DoQuery(
+        "DELETE FROM uppaCours WHERE idCours NOT IN ( SELECT MIN(idCours) FROM uppaCours GROUP BY nomCours, dateDeb )"
+      );
+    });
 
   return { error: thereIsAnError, nbSynced: (global as any).totalSynced };
 };
