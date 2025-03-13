@@ -36,7 +36,7 @@ app.use((req, res, next) => {
     * Description : Renvoie un message de bienvenue
 */
 app.get('/', (req: express.Request, res: express.Response) => {
-    res.send('UPPA - API REST <br> Auteur : Romain PINSOLLE <br> Site Web : romain-pinsolle.fr <br> modif du 13/03/2025 <br><br> <a href="/planning/syncAll">Syncro manuelle</a>');
+    res.send('UPPA - API REST <br> Auteur : Romain PINSOLLE <br> Site Web : romain-pinsolle.fr <br> modif du 13/03/2025 - 1<br><br> <a href="/planning/syncAll">Syncro manuelle</a>');
 });
 
 
