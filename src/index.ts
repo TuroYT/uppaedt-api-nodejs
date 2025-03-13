@@ -36,7 +36,7 @@ app.use((req, res, next) => {
     * Description : Renvoie un message de bienvenue
 */
 app.get('/', (req: express.Request, res: express.Response) => {
-    res.send('UPPA - API REST <br> Auteur : Romain PINSOLLE <br> Site Web : romain-pinsolle.fr <br> modif du 12/03/2025 <br><br> <a href="/planning/syncAll">Syncro manuelle</a>');
+    res.send('UPPA - API REST <br> Auteur : Romain PINSOLLE <br> Site Web : romain-pinsolle.fr <br> modif du 13/03/2025 <br><br> <a href="/planning/syncAll">Syncro manuelle</a>');
 });
 
 
@@ -57,10 +57,16 @@ app.get('/planning/syncAll', planningSyncAll)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-    cron.schedule('0 2 * * *', () => {
-        console.log('Running syncAll at 2AM');
-        syncPlannings();
-    });
+
+    if (process.env.CRON_ENABLED === "1") {
+        console.log("Les updates automatiques sont activés")
+        cron.schedule('0 2 * * *', () => {
+            console.log('Running syncAll at 2AM');
+            syncPlannings();
+        });
+    }
+
+
 });
 
 
