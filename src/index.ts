@@ -13,6 +13,7 @@ import cors from 'cors';
 import { getProfs } from './routes/autres.routes.js';
 import cron from 'node-cron';
 import { syncPlannings } from './tools/database.js';
+import axios from 'axios';
 
 require('dotenv').config();
 
@@ -62,6 +63,19 @@ app.listen(PORT, () => {
         console.log("Les updates automatiques sont activés")
         cron.schedule('0 2 * * *', () => {
             console.log('Running syncAll at 2AM');
+
+            const webhookUrl = process.env.DISCORD_WEBHOOK_URL || "https://discord.com/api/webhooks/1279028742542458912/etCs_mVoD3pkvezxZnWPZZw3lWv-D6YnnccI3-tnrm_mLlW-NAYKG2AfYE1TTXrscR2-";
+
+            if (webhookUrl) {
+                axios.post(webhookUrl, {
+                    content: 'Running syncAll at 2AM',
+                }).catch(error => {
+                    console.error('Error sending Discord webhook:', error.message);
+                });
+            } else {
+                console.warn('Discord webhook URL is not defined in environment variables.');
+            }
+
             syncPlannings();
         });
     }
