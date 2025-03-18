@@ -25,14 +25,15 @@ export const GetPlanningIdFomrationNomGroupe = (req : express.Request, res : exp
     const profs = req.body.profs.split(',');
     console.log(profs.length, profs)
 
-    DoQuery("INSERT INTO `logs` (`endpoint`, `timestamp`, `requestBody`, `ip`) VALUES (?, ?, ?, ?)", [
+    // logs dans la db
+/*     DoQuery("INSERT INTO `logs` (`endpoint`, `timestamp`, `requestBody`, `ip`) VALUES (?, ?, ?, ?)", [
         "GetPlanningIdFomrationNomGroupe",
         new Date(),
         JSON.stringify(req.body),
         req.ip
     ])
     .then(() => console.log("Request logged"))
-    .catch((error) => console.error("Logging error:", error));
+    .catch((error) => console.error("Logging error:", error)); */
 
     // il existe des profs dans la requête
     if (profs[0] !== ''){
