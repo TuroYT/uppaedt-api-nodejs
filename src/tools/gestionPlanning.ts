@@ -31,12 +31,10 @@ export const prepareIcalForDB = async (ical: any) => {
     if (ical[k].type === "VEVENT") {
       // Verif HyperPlanning
       if (ical[k].categories) {
-
         // ! le planning est au format hyperplanning
-      
+        // implémentation future
       } else {
         // * planning générique
-
         let infos = ical[k].description.split("\n");
         let prof;
         let groupeTp;
@@ -51,7 +49,6 @@ export const prepareIcalForDB = async (ical: any) => {
           prof = "NA";
           groupeTp = "NA";
         }
-
         let event = {
           nomCours: ical[k].summary,
           dateDeb: new Date(ical[k].start),
@@ -60,12 +57,10 @@ export const prepareIcalForDB = async (ical: any) => {
           lieu: ical[k].location,
           nomTp: groupeTp,
         };
-
         preparedEvent.push(event);
       }
     }
   }
-
   return preparedEvent;
 };
 
