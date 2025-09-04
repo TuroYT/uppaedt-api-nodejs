@@ -21,6 +21,7 @@ import mysql from "mysql";
 import { getIcalFromWeb, prepareIcalForDB } from "./gestionPlanning.js";
 import dotenv from "dotenv";
 import { dbConfig } from "../configs/db.config"; // db config
+import { env } from "process";
 dotenv.config();
 
 //  ! Création de la connexion à la base de données
@@ -144,15 +145,14 @@ const getAllIcsLinks = () => {
 export const syncPlannings = async () => {
   let thereIsAnError = false;
   (global as any).totalSynced = 0;
-      // supprimer les cours 
-      pool.query("DELETE FROM `uppaCours` WHERE `dateDeb` > NOW();", async (err: any, results: any) => {
-        if (err) {
-          console.error("Error deleting future courses:", err);
-          return;
-        }
-        console.log("Deleted future courses:", results.affectedRows);
-      });
-
+  // supprimer les cours
+  pool.query("DELETE FROM `uppaCours` WHERE `dateDeb` > NOW();", async (err: any, results: any) => {
+    if (err) {
+      console.error("Error deleting future courses:", err);
+      return;
+    }
+    console.log("Deleted future courses:", results.affectedRows);
+  });
 
   const doSync = async () => {
     // * get all ics links
@@ -162,10 +162,13 @@ export const syncPlannings = async () => {
 
       let parsedIcal = await prepareIcalForDB(ical);
 
-
-
       for (let k in parsedIcal) {
         let currentCourse = parsedIcal[k];
+
+        // gestion du décalage horaire
+        const heureOffset = parseInt(env.HEURE_OFFSET || "0", 10);
+        currentCourse.dateDeb = new Date(currentCourse.dateDeb.getTime() + heureOffset * 60 * 60 * 1000);
+        currentCourse.dateFin = new Date(currentCourse.dateFin.getTime() + heureOffset * 60 * 60 * 1000);
 
         if (currentCourse.dateDeb > new Date()) {
           try {

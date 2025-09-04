@@ -57,6 +57,7 @@ The following environment variables are required:
 - `DB_USER`: The database user.
 - `DB_PASS`: The database password.
 - `DB_NAME`: The database name.
+- `HEURE_OFFSET`: Offset in hours for scheduling tasks (default is 0).
 
 ## Docker
 
